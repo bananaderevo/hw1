@@ -1,16 +1,42 @@
-# This is a sample Python script.
+from flask import Flask
+from faker import Faker
+from flask import request
+import requests
+import csv
+fake = Faker()
+app = Flask(__name__)
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+req = open(r'requirements.txt', 'r')
+rr = ''
+while True:
+    line = req.readline()
+    if not line:
+        break
+    rr += '<p>' + line.strip() + '</p>'
 
+@app.route('/requirements/')
+def requirements():
+    return rr
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+@app.route('/generate-users/')
+def fakes():
+    a = int(request.args.get('count', 100))
+    fn = ''
+    for i in range(a):
+        fn += '<p>' + fake.name() + '</p>'
+    return fn
+@app.route('/mean/')
+def h_w():
+    with open('hw.csv', newline='') as csvfile:
+        b = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        h = w = i =0
+        for row in b:
+            if row != [] and row[1].replace(',', '').replace('.', '').isdigit():
+                h += float(row[1].replace(',', ''))
+                w += float(row[2].replace(',', ''))
+                i += 1
+        return '<p>Average height: ' + str(h/i*2.54) + ' cm' + '</p><p>Average weight: ' + str(w/i*0.453) + ' kg'
+@app.route('/space/')
+def cosmo():
+    return 'Number of people: ' + str(requests.get('http://api.open-notify.org/astros.json').json()["number"])
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
